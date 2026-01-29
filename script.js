@@ -1,21 +1,53 @@
-const copyBtn = document.getElementById('copyBtn');
+const promptCard = document.getElementById("promptCard");
+const copyBtn = document.getElementById("copyBtn");
+const ackRead = document.getElementById("ackRead");
+const brutalToggle = document.getElementById("brutalToggle");
+const memoryText = document.getElementById("memoryText");
+const returnTop = document.getElementById("returnTop");
 
-const promptText = `
-It’s 2027. You’re doing $800,000 months.
-I just launched to $600 in sales and I’m humiliated.
+let brutal = false;
 
-What three things did you fix in the next launch that 10x’d it?
-The positioning shift.
-The new avatar.
-The pain point you missed.
+// Timed reveal
+setTimeout(() => {
+  promptCard.classList.add("show");
+}, 8000);
 
-Save me before I quit.
-`;
+// Read acknowledgment
+ackRead.addEventListener("change", () => {
+  copyBtn.disabled = !ackRead.checked;
+});
 
-copyBtn.addEventListener('click', () => {
-  navigator.clipboard.writeText(promptText.trim());
-  copyBtn.textContent = 'Copied';
-  setTimeout(() => {
-    copyBtn.textContent = 'Copy Prompt';
-  }, 1500);
+// Brutal mode toggle
+brutalToggle.addEventListener("click", () => {
+  brutal = !brutal;
+  brutalToggle.innerHTML = `Brutal mode: <span>${brutal ? "on" : "off"}</span>`;
+});
+
+// Copy logic
+copyBtn.addEventListener("click", () => {
+  let text = document.getElementById("promptText").innerText;
+
+  if (brutal) {
+    text += "\n\nDo not soften language. Assume competence is not the issue.";
+  }
+
+  text += "\n\n—\nFrom a private teardown.";
+
+  navigator.clipboard.writeText(text);
+
+  localStorage.setItem("copiedBefore", "yes");
+  localStorage.setItem("copyTime", new Date().toLocaleString());
+
+  copyBtn.innerText = "Copied";
+  setTimeout(() => copyBtn.innerText = "Copy Prompt", 1500);
+});
+
+// Memory callback
+if (localStorage.getItem("copiedBefore")) {
+  memoryText.innerText = "Most people don’t come back. You did.";
+}
+
+// Scroll return
+returnTop.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
